@@ -6,7 +6,7 @@ A tool for connect url write by Golang
 
 In this month (2021.11), our development plan is adding the following functions:
 
-- `-X`,  a flag to choose http method you want to use;    ❌
+- `-X`,  a flag to choose http method you want to use;    ✅
 - `-I`, a flag to show response head and page source code;    ❌
 - `-v`, a flag to show connect process;    ❌
 - `-V`, a flag to show goURL version;    ✅

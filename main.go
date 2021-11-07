@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"goURL/utils"
+	"log"
 	"os"
 	"runtime"
 
 	"github.com/fatih/color"
+	"goURL/parser"
 )
 
 var (
@@ -35,9 +38,10 @@ func usage()  {
 }
 
 func main() {
-	// parse command-line flags from os.Args[1:]
+	// parse command-line flags from os.Args[1:].
 	flag.Parse()
 
+	// show goURL version or warning.
 	if showVersion {
 		if version == "Dev" {
 			// print information with red color !
@@ -50,6 +54,14 @@ func main() {
 	args := flag.Args()
 	if len(args) != 1 {
 		flag.Usage()
-		os.Exit(2)
+		log.Fatalf(color.HiRedString("Too few arguments"))
 	}
+
+	// parse url argument.
+	url, err := parser.ParseURL(args[0])
+	if err != nil {
+		log.Fatalf(color.HiRedString("Something wrong while parsing url:" + err.Error()))
+	}
+	// do connect with target URL.
+	utils.VisitURL(url)
 }

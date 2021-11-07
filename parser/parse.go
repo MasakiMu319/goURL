@@ -9,7 +9,7 @@ import (
 
 func ParseURL(uri string) (*url.URL, error) {
 	// we can only solve "*://url" and "//url".
-	// if user type incorrect url unfortunately, like "///url",
+	// if user types incorrect url unfortunately, like "///url",
 	// it's a bad news for our program.
 	// TODO: think about a solution for this.
 	// one way to solve this is force check weather url is correct
@@ -43,6 +43,7 @@ func ParseURL(uri string) (*url.URL, error) {
 	return url, nil
 }
 
+// check input url format.
 func checkURL(url string) (string, error) {
 	// The correct url types is:
 	// example.com

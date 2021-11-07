@@ -3,31 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
-	"goURL/utils"
 	"log"
 	"os"
 	"runtime"
 
 	"github.com/fatih/color"
 	"goURL/parser"
-)
-
-var (
-	// Command line flags
-	httpMethod       string // http method
-	httpResponseHead bool   // response head
-	httpConnectInfo  bool   // connect information
-
-	showVersion bool	// show program version
-
-	version = "Dev"
+	"goURL/utils"
 )
 
 func init() {
-	flag.StringVar(&httpMethod, "X", "GET", "HTTP method to use")
-	flag.BoolVar(&httpResponseHead, "I", false, "show response head and source code of page")
-	flag.BoolVar(&httpConnectInfo, "v", false, "show connect process")
-	flag.BoolVar(&showVersion, "V", false, "show goURL version")
+	flag.StringVar(&utils.HttpMethod, "X", "GET", "HTTP method to use")
+	flag.BoolVar(&utils.HttpResponseHead, "I", false, "show response head and source code of page")
+	flag.BoolVar(&utils.HttpConnectInfo, "v", false, "show connect process")
+	flag.BoolVar(&utils.ShowVersion, "V", false, "show goURL version")
 	flag.Usage = usage
 }
 
@@ -42,12 +31,12 @@ func main() {
 	flag.Parse()
 
 	// show goURL version or warning.
-	if showVersion {
-		if version == "Dev" {
+	if utils.ShowVersion {
+		if utils.Version == "Dev" {
 			// print information with red color !
-			color.HiRed("This is a %s version! Please do not use in a product environment! \n (runtime: %s)\n\n", version, runtime.Version())
+			color.HiRed("This is a %s version! Please do not use in a product environment! \n (runtime: %s)\n", utils.Version, runtime.Version())
 		} else {
-			fmt.Printf("goURL version: %s \n(runtime: %s)\n\n", version, runtime.Version())
+			fmt.Printf("goURL version: %s \n(runtime: %s)\n", utils.VisitURL, runtime.Version())
 		}
 	}
 
@@ -63,5 +52,8 @@ func main() {
 		log.Fatalf(color.HiRedString("Something wrong while parsing url:" + err.Error()))
 	}
 	// do connect with target URL.
-	utils.VisitURL(url)
+	err = utils.VisitURL(url)
+	if err != nil {
+		log.Fatalf(color.HiRedString(err.Error()))
+	}
 }

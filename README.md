@@ -22,4 +22,10 @@ After that, we will consider adding the following features：
 
 ## Function Scrernshot
 
-![image-20211107200031701](https://typora-photos.oss-cn-shenzhen.aliyuncs.com/image-20211107200031701.png)
+### OPTIONS
+
+![image-20211108001108763](https://typora-photos.oss-cn-shenzhen.aliyuncs.com/image-20211108001108763.png)
+
+### TEST CONNECTION
+
+![image-20211108001037609](https://typora-photos.oss-cn-shenzhen.aliyuncs.com/image-20211108001037609.png)

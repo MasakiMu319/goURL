@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -140,6 +141,7 @@ func VisitURL(url *url.URL) error {
 	}
 
 	resp, err := client.Do(req)
+	defer resp.Body.Close()
 	if err != nil {
 		return errors.New(color.HiRedString("failed to read response:", err))
 	}
@@ -155,17 +157,20 @@ func VisitURL(url *url.URL) error {
 	}
 	printf("\n%s %s\n", color.GreenString("Connected via"), color.CyanString("%s", connectedVia))
 
-	resp.Body.Close()
-
-	names := make([]string, 0, len(resp.Header))
-	for k := range resp.Header {
-		names = append(names, k)
+	if HttpResponseHead {
+		names := make([]string, 0, len(resp.Header))
+		for k := range resp.Header {
+			names = append(names, k)
+		}
+		sort.Sort(headers(names))
+		for _, k := range names {
+			printf("%s %s\n", grayscale(14)(k+":"), color.CyanString(strings.Join(resp.Header[k], ",")))
+		}
+		// this func is show full response body.
+		showResponseBody(resp)
+	} else {
+		showBriefResponse(resp)
 	}
-	sort.Sort(headers(names))
-	for _, k := range names {
-		printf("%s %s\n", grayscale(14)(k+":"), color.CyanString(strings.Join(resp.Header[k], ",")))
-	}
-
 	return nil
 }
 
@@ -180,4 +185,22 @@ func newRequest(method string, url *url.URL, body string) (*http.Request, error)
 
 func createBody(body string) io.Reader {
 	return strings.NewReader(body)
+}
+
+// show brief response body.
+func showBriefResponse(resp *http.Response)  {
+	s, _ := ioutil.ReadAll(resp.Body)
+	body := strings.Split(string(s), "\n")
+	// we only show first and last five lines.
+	show := append(body[:5], body[len(body) - 3:]...)
+	printf("%s", grayscale(14)("Body:"))
+	for _, s := range show {
+		printf("%s\n", color.CyanString(s))
+	}
+}
+
+// Show full response.
+func showResponseBody(resp *http.Response)  {
+	s, _ := ioutil.ReadAll(resp.Body)
+	printf("%s %s\n", grayscale(14)("Body:"), color.CyanString(string(s)))
 }

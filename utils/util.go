@@ -93,6 +93,9 @@ func grayscale(code color.Attribute) func(string, ...interface{}) string {
 func VisitURL(url *url.URL) error {
 	// TODO: data body have not set flag
 	req, err := newRequest(HttpMethod, url, "")
+	// We add req User-Agent
+	// // TODO: modify this param later
+	req.Header.Add("User-Agent", "curl/7.77.0")
 	if err != nil {
 		return err
 	}
@@ -157,14 +160,17 @@ func VisitURL(url *url.URL) error {
 	}
 	printf("\n%s %s\n", color.GreenString("Connected via"), color.CyanString("%s", connectedVia))
 
+	// show connect-info
+	if HttpConnectInfo {
+		showRequestInfo(req)
+		printf("%s\n", grayscale(14)("*Get response from server"))
+		showResponseHeader(resp)
+	}
+
+	// show response head and source code
 	if HttpResponseHead {
-		names := make([]string, 0, len(resp.Header))
-		for k := range resp.Header {
-			names = append(names, k)
-		}
-		sort.Sort(headers(names))
-		for _, k := range names {
-			printf("%s %s\n", grayscale(14)(k+":"), color.CyanString(strings.Join(resp.Header[k], ",")))
+		if !HttpConnectInfo {
+			showResponseHeader(resp)
 		}
 		// this func is show full response body.
 		showResponseBody(resp)
@@ -185,6 +191,32 @@ func newRequest(method string, url *url.URL, body string) (*http.Request, error)
 
 func createBody(body string) io.Reader {
 	return strings.NewReader(body)
+}
+
+func showRequestInfo(req *http.Request)  {
+	printf(">%s %s\n", grayscale(14)(req.Method), grayscale(14)(req.Proto))
+	printf(">%s:%s\n", grayscale(14)("Host"), color.CyanString(req.Host))
+	userAgent := req.UserAgent()
+	if userAgent == "" {
+		userAgent = "*"
+	}
+	printf(">%s:%s\n", grayscale(14)("User-Agent"), color.CyanString(userAgent))
+	accept := req.Header.Get("Accept")
+	if accept == "" {
+		accept = "*/*"
+	}
+	printf(">%s:%s\n", grayscale(14)("Accept"), color.CyanString(accept))
+}
+
+func showResponseHeader(resp *http.Response)  {
+	names := make([]string, 0, len(resp.Header))
+	for k := range resp.Header {
+		names = append(names, k)
+	}
+	sort.Sort(headers(names))
+	for _, k := range names {
+		printf("<%s %s\n", grayscale(14)(k+":"), color.CyanString(strings.Join(resp.Header[k], ",")))
+	}
 }
 
 // show brief response body.

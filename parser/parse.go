@@ -29,6 +29,11 @@ func ParseURL(uri string) (*url.URL, error) {
 		return nil, err
 	}
 
+	// special behave when url is a localhost
+	if localhost := strings.Contains(uri, "localhost"); localhost {
+		uri = "http://" + uri
+	}
+
 	url, err := url.Parse(uri)
 	if err != nil {
 		return nil, err
